@@ -31,11 +31,15 @@ class Game {
 
         this.graphics = new GraphicsContext(this.context);
 
-        this.entities.push(new Particle());
+        this.entities.push(new Diproton());
     }
 
     update(timeDelta) {
         this.time += timeDelta;
+
+        for (let e of this.entities) {
+            e.update(   this.time, timeDelta);
+        }
     }
 
     draw() {
