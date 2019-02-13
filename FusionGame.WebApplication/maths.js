@@ -1,9 +1,4 @@
 ﻿
-
-
-
-
-
 class Vector2D {
     constructor(x = 0, y = 0){
         this.x = x;
@@ -17,7 +12,6 @@ class Vector2D {
     get m(){
         return this.magnitude;
     }
-
 
     get unitVector(){
         return this.scale(1/this.m);
@@ -35,7 +29,23 @@ class Vector2D {
         return this.normalUnitVector;
     }
 
+    get argument (){
+        var theta = toDegrees(Math.atan(this.y / this.x));
 
+        if (this.x < 0){
+            return 180 + theta;
+        }
+
+        if (this.x > 0 && this.y < 0){
+            return 360 + theta;
+        }
+
+        return theta;
+    }
+
+    get a (){
+        return this.argument ;
+    }
 
     add (vector){
         var v = new Vector2D();
@@ -45,7 +55,6 @@ class Vector2D {
 
         return v;
     } 
-
 
    subtract(vector){
         var v = new Vector2D();
@@ -121,11 +130,6 @@ class Vector2D {
         return point1.subtract(point2).m;
     }
 
-
-
-
-
-
     class Matrix2D {
           constructor(a11 = 0, a12 = 0, a21 = 0, a22 = 0){
               this.a11 = a11;
@@ -137,15 +141,7 @@ class Vector2D {
           times (vector){
               return new Vector2D(   this.a11 * vector.x + this.a12 * vector.y,  this.a21 * vector.x + this.a22 * vector.y);
           }
-    }
-
-
-
-
-
-
-             
-
+    }          
 
     class RotationMatrix2D   extends Matrix2D {
           constructor(theta = 0){
@@ -156,10 +152,6 @@ class Vector2D {
    }
 }
 
-
-
-
-
 function toRadians(degrees){
     return (degrees / 360) * 2 * Math.PI;
 }
@@ -167,10 +159,3 @@ function toRadians(degrees){
 function toDegrees (radians){
     return (  radians / (2 * Math.PI)) * 360;
 }
-
-
-
-
-
-
-
