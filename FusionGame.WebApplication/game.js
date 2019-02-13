@@ -26,12 +26,19 @@ class Game {
         this.canvas.style.width = window.innerWidth + "px";
         this.canvas.style.height = window.innerHeight + "px";
 
+        this.areaWidth = window.innerWidth;
+        this.areaHeight = window.innerHeight;
+
         this.context = this.canvas.getContext("2d");
         this.context.scale(this.resolutionFactor, this.resolutionFactor);
 
         this.graphics = new GraphicsContext(this.context);
 
-        this.entities.push(new Diproton());
+        this.targetPosition = new Vector2D(this.areaWidth / 2, this.areaHeight * 0.2);
+        this.target = new Proton();
+        this.target.centre = this.targetPosition;
+          
+
     }
 
     update(timeDelta) {
@@ -42,12 +49,33 @@ class Game {
         }
     }
 
+    keyDown(e) {
+        if (e.code == "ArrowUp" || e.code == "Space") {
+
+            var e1 = new Vector2D(this.areaWidth / 2, this.areaHeight * 0.8);
+
+            var p = new Proton();
+
+            p.centre = e1;
+            p.velocity.x = Math.random() * 100 - 50;
+            p.velocity.y = -1000;
+
+            this.entities.push(p);
+        }
+    }
+
+
+    keyUp(e) {
+    }
+
     draw() {
         this.graphics.clear(this.canvas.width, this.canvas.height, "white");
 
         for (let e of this.entities) {
             e.draw(this.graphics);
         }
+
+        this.target.draw(this.graphics);
     }
 }
 

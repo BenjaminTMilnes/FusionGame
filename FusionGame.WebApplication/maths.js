@@ -65,6 +65,10 @@ class Vector2D {
         return v;
     }
 
+   times (scalar){
+       return this.scale(scalar, scalar);
+   }
+
    translate(dx = 0, dy = 0){
        var v = new Vector2D();
 

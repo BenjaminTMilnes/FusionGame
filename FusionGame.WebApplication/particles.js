@@ -22,7 +22,13 @@ class Particle extends Entity {
         this.centre = new Vector2D(200, 200);
         this.radius = 20;
         this.fillColour = "red";
-        }
+
+        this.velocity = new Vector2D();
+    }
+
+    update(time, timeDelta) {
+        this.centre = this.centre.add(this.velocity.times(timeDelta / 1000));
+    }
 
     draw(graphics) {
         super.draw(graphics);

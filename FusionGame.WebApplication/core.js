@@ -22,7 +22,7 @@ function startGame() {
 function gameLoop(timestamp) {
     var timeDelta = timestamp - lastFrameTimestamp;
 
-    if (timeDelta < 30) {
+    if (timeDelta < 10) {
         requestAnimationFrame(gameLoop);
         return;
     }
