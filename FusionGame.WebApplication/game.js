@@ -28,6 +28,10 @@ class Game {
 
         this.context = this.canvas.getContext("2d");
         this.context.scale(this.resolutionFactor, this.resolutionFactor);
+
+        this.graphics = new GraphicsContext(this.context);
+
+        this.entities.push(new Particle());
     }
 
     update(timeDelta) {
@@ -35,7 +39,11 @@ class Game {
     }
 
     draw() {
+        this.graphics.clear(this.canvas.width, this.canvas.height, "white");
 
+        for (let e of this.entities) {
+            e.draw(this.graphics);
+        }
     }
 }
 
