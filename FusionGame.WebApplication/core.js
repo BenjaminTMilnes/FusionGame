@@ -1,5 +1,5 @@
-﻿var game = new Game("gameView");
-var lastDraw = 0;
+﻿var game = new Game("gameCanvas");
+var lastFrameTimestamp = 0;
 
 window.addEventListener("keydown", function (e) {
     game.keyDown(e);
@@ -16,23 +16,23 @@ window.addEventListener("resize", function (e) {
 function startGame() {
     game.initialise();
 
-    requestAnimationFrame(mainLoop);
+    requestAnimationFrame(gameLoop);
 }
 
-function mainLoop(timestamp) {
-    var timeDelta = timestamp - lastDraw;
+function gameLoop(timestamp) {
+    var timeDelta = timestamp - lastFrameTimestamp;
 
     if (timeDelta < 30) {
-        requestAnimationFrame(mainLoop);
+        requestAnimationFrame(gameLoop);
         return;
     }
 
     game.update(timeDelta);
     game.draw();
 
-    lastDraw = timestamp;
+    lastFrameTimestamp = timestamp;
 
-    requestAnimationFrame(mainLoop);
+    requestAnimationFrame(gameLoop);
 }
 
 window.addEventListener("DOMContentLoaded", startGame);
