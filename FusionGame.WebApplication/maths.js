@@ -19,7 +19,22 @@ class Vector2D {
     }
 
 
-       
+    get unitVector(){
+        return this.scale(1/this.m);
+    }
+
+    get u(){
+        return this.unitVector;
+    }
+
+    get normalUnitVector(){
+        return this.u.rotate(90);
+    }
+
+    get n(){
+        return this.normalUnitVector;
+    }
+
 
 
     add (vector){
@@ -86,7 +101,29 @@ class Vector2D {
     reflectY(){
         return this.scaleY(-1);
     }
+
+    rotate (theta){
+        var r = new RotationMatrix2D(theta);
+    
+        return r.times(this);
     }
+
+    rotateAboutPoint(theta, point){
+        var v = this.subtract(point);
+        v = v.rotate(theta);
+        v = v.add(point);
+
+        return v;
+    }
+    }
+
+    function ds(point1, point2){
+        return point1.subtract(point2).m;
+    }
+
+
+
+
 
 
     class Matrix2D {
@@ -112,7 +149,28 @@ class Vector2D {
 
     class RotationMatrix2D   extends Matrix2D {
           constructor(theta = 0){
+        super(Math.cos(toRadians(theta)), - Math.sin(toRadians(theta)), Math.sin(toRadians(theta)), Math.cos(toRadians(theta)));
+
+        this.theta = theta;
+        this.thetaR = toRadians(theta);
    }
 }
+
+
+
+
+
+function toRadians(degrees){
+    return (degrees / 360) * 2 * Math.PI;
+}
+
+function toDegrees (radians){
+    return (  radians / (2 * Math.PI)) * 360;
+}
+
+
+
+
+
 
 
