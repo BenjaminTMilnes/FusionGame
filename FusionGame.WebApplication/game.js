@@ -14,7 +14,6 @@ class Game {
     }
 
     initialise() {
-
         this.canvas = document.getElementById(this.canvasId);
         this.canvasLeft = this.canvas.getBoundingClientRect().left;
         this.canvasTop = this.canvas.getBoundingClientRect().top;

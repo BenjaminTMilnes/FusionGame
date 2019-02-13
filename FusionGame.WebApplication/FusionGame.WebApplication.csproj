@@ -77,7 +77,10 @@
   <ItemGroup>
     <Content Include="core.js" />
     <Content Include="game.js" />
+    <Content Include="graphics.js" />
     <Content Include="index.html" />
+    <Content Include="maths.js" />
+    <Content Include="particles.js" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
