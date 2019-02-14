@@ -116,6 +116,12 @@ class Nucleus extends Entity {
             this.nucleons[1].centre = this.centre.add(u1.rotate(0));
             this.nucleons[2].centre = this.centre.add(u1.rotate(-120));
         }
+        if (this.nucleons.length == 4) {
+            this.nucleons[0].centre = this.centre.add(u1.times(1.2).rotate(90));
+            this.nucleons[1].centre = this.centre.add(u1.times(1.2).rotate(0));
+            this.nucleons[2].centre = this.centre.add(u1.times(1.2).rotate(-90));
+            this.nucleons[3].centre = this.centre.add(u1.times(1.2).rotate(180));
+        }
     }
 
     draw(graphics) {
@@ -124,7 +130,7 @@ class Nucleus extends Entity {
         });
 
         if (this.showLabel) {
-            graphics.drawText(this.label, this.centre.translateY(-40));
+            graphics.drawText(this.label, this.centre.translateY(-50));
         }
     }
 }
@@ -164,6 +170,25 @@ class DeuteriumNucleus extends Nucleus {
 
 
 
+class TritiumNucleus extends Nucleus {
+    constructor() {
+        super();
+
+        this.label = "Tritium Nucleus";
+
+        this.centre = new Vector2D(200, 200);
+
+        this.nucleons.push(new Proton());
+        this.nucleons.push(new Neutron());
+        this.nucleons.push(new Neutron());
+    }
+}
+
+
+
+
+
+
 
 class Helium3Nucleus extends Nucleus {
     constructor() {
@@ -178,6 +203,61 @@ class Helium3Nucleus extends Nucleus {
         this.nucleons.push(new Neutron());
     }
 }
+
+
+
+class Helium4Nucleus extends Nucleus {
+    constructor() {
+        super();
+
+        this.label = "Helium-4 Nucleus";
+
+        this.centre = new Vector2D(200, 200);
+
+        this.nucleons.push(new Proton());
+        this.nucleons.push(new Neutron());
+        this.nucleons.push(new Proton());
+        this.nucleons.push(new Neutron());
+    }
+}
+
+
+
+
+class Chamber extends Entity {
+    constructor() {
+        super();
+
+        this.particles = [Proton, DeuteriumNucleus, TritiumNucleus, Helium3Nucleus, Helium4Nucleus];
+
+        this.entities = [];
+
+        for (var i = 0; i < this.particles.length; i++) {
+            var p = new this.particles[i]();
+
+            p.showLabel = true;
+
+            this.entities.push(p);
+        }
+    }
+
+    update(time, timeDelta) {
+        this.entities.forEach(e => {
+            var i = this.entities.indexOf(e);
+
+          e.centre = this.position.translateX(i * 150);
+
+            e.update(time, timeDelta);
+        });
+    }
+
+    draw(graphics) {
+        this.entities.forEach(e => { e.draw(graphics); });
+
+    }
+}
+
+
 
 
 

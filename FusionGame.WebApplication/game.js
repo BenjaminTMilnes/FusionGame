@@ -18,7 +18,7 @@ class Game {
         this.canvasLeft = this.canvas.getBoundingClientRect().left;
         this.canvasTop = this.canvas.getBoundingClientRect().top;
 
-        this.resolutionFactor = 4;
+        this.resolutionFactor = 3;
 
         this.canvas.width = window.innerWidth * this.resolutionFactor;
         this.canvas.height = window.innerHeight * this.resolutionFactor;
@@ -31,6 +31,7 @@ class Game {
 
         this.context = this.canvas.getContext("2d");
         this.context.scale(this.resolutionFactor, this.resolutionFactor);
+        this.context.imageSmoothingQuality = "high";
 
         this.graphics = new GraphicsContext(this.context);
 
@@ -38,7 +39,9 @@ class Game {
         this.target = new Helium3Nucleus();
         this.target.centre = this.targetPosition;
         this.target.showLabel = true;
-          
+
+        this.chamber = new Chamber();
+        this.chamber.position = new Vector2D(this.areaWidth / 2, this.areaHeight * 0.8);
 
     }
 
@@ -52,6 +55,8 @@ class Game {
         }
 
         this.target.update(this.time, timeDelta);
+
+        this.chamber.update(this.time, timeDelta);
     }
 
     keyDown(e) {
@@ -81,6 +86,7 @@ class Game {
         }
 
         this.target.draw(this.graphics);
+        this.chamber.draw(this.graphics);
     }
 }
 
