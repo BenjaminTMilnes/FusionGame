@@ -20,20 +20,39 @@ class Particle extends Entity {
         super();
 
         this.centre = new Vector2D(200, 200);
-        this.radius = 20;
+        this.radius = 15;
         this.fillColour = "red";
 
         this.velocity = new Vector2D();
+
+        this.trail = [];
+
+        this.label = "";
+        this.showLabel = false;
     }
 
     update(time, timeDelta) {
+        if (this.trail.length > 5) {
+            this.trail.shift();
+        }
+
+        this.trail.push(this.centre);
+
         this.centre = this.centre.add(this.velocity.times(timeDelta / 1000));
     }
 
     draw(graphics) {
         super.draw(graphics);
 
-        graphics.drawCircle(this.centre, this.radius,  this.fillColour);
+        var gradient = graphics.createPositiveChargeGradient(this.centre, this.radius);
+
+        graphics.drawCircle(this.centre, this.radius, gradient, "#7f0217");
+
+        graphics.drawPath(this.trail, "none", "blue");
+
+        if (this.showLabel) {
+            graphics.drawText(this.label, this.centre.translateY(-30));
+        }
     }
 }
 
@@ -42,6 +61,8 @@ class Particle extends Entity {
 class Proton extends Particle {
     constructor() {
         super();
+
+        this.label = "Proton";
     }
 }
 
@@ -51,6 +72,7 @@ class Neutron extends Particle {
         super();
 
         this.fillColour = "grey";
+        this.label = "Neutron";
     }
 }
 

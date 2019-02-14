@@ -37,6 +37,7 @@ class Game {
         this.targetPosition = new Vector2D(this.areaWidth / 2, this.areaHeight * 0.2);
         this.target = new Proton();
         this.target.centre = this.targetPosition;
+        this.target.showLabel = true;
           
 
     }
