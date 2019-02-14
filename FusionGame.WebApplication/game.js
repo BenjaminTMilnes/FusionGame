@@ -49,9 +49,32 @@ class Game {
         this.time += timeDelta;
 
         this.entities = this.entities.filter(e => e.centre.y > -200 && e.centre.y < 2000 && e.centre.x > -200 && e.centre.x < 4000);
-        
+
         for (let e of this.entities) {
-            e.update(   this.time, timeDelta);
+            e.force = new Vector2D();
+
+            for (let g of this.entities) {
+                var r = ds(e.centre, g.centre);
+
+                if (r > 5 && !isNaN(r)) {
+                    var u = e.centre.subtract(g.centre).u;
+                    var f = 100 * e.charge * g.charge / Math.pow(r, 2);
+
+                    e.force = e.force.add(u.times(f));
+                }
+
+            }
+            var r = ds(e.centre, this.target.centre);
+
+            if (r > 5 && !isNaN(r)) {
+                var u = e.centre.subtract(this.target.centre).u;
+                var f = 80000 * e.charge * this.target.charge / Math.pow(r, 2);
+
+                e.force = e.force.add(u.times(f));
+            }
+
+
+            e.update(this.time, timeDelta);
         }
 
         this.target.update(this.time, timeDelta);

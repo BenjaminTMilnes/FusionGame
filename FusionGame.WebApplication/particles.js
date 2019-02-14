@@ -23,7 +23,10 @@ class Particle extends Entity {
         this.radius = 15;
         this.fillColour = "red";
 
+        this.mass = 1;
+        this.force = new Vector2D();
         this.velocity = new Vector2D();
+        this.acceleration = new Vector2D();
 
         this.charge = 0;
 
@@ -43,8 +46,12 @@ class Particle extends Entity {
             this.trail.push(this.centre);
         }
 
+        this.acceleration = this.force.times(1 / this.mass);
+
+        this.velocity = this.velocity.add(this.acceleration.times(timeDelta / 1000));
+
         this.centre = this.centre.add(this.velocity.times(timeDelta / 1000));
-    }
+            }
 
     draw(graphics) {
         super.draw(graphics);
@@ -128,6 +135,16 @@ class Nucleus extends Entity {
         this.showTrail = false;
 
         this.nucleons = [];
+    }
+
+    get charge() {
+        var q = 0;
+
+        this.nucleons.forEach(n => {
+            q += n.charge;
+        });
+
+        return q;
     }
 
     update(time, timeDelta) {
@@ -280,6 +297,8 @@ class Chamber extends Entity {
         this.particles = [ Electron,  Proton, DeuteriumNucleus, TritiumNucleus, Helium3Nucleus, Helium4Nucleus];
         this.currentParticle = 1;
 
+        this.numbersOfParticles = [100, 100, 10, 10, 10, 10];
+
         this.entities = [];
 
         for (var i = 0; i < this.particles.length; i++) {
@@ -317,17 +336,21 @@ class Chamber extends Entity {
     }
 
     fireParticle() {
-        var e1 = new Vector2D(this.game.areaWidth / 2, this.game.areaHeight * 0.8);
+        if (this.numbersOfParticles[this.currentParticle] > 0) {
+            var e1 = new Vector2D(this.game.areaWidth / 2, this.game.areaHeight * 0.8);
 
-        var p = new this.particles[this.currentParticle]();
+            var p = new this.particles[this.currentParticle]();
 
-        p.centre = e1;
-        p.orientation = Math.round(Math.random() * 360);
-        p.velocity.x = Math.random() * 100 - 50;
-        p.velocity.y = -1000;
-        p.showTrail = true;
+            p.centre = e1;
+            p.orientation = Math.round(Math.random() * 360);
+            p.velocity.x = Math.random() * 200 - 100;
+            p.velocity.y = -1000;
+            p.showTrail = true;
 
-        this.game.entities.push(p);
+            this.game.entities.push(p);
+
+            this.numbersOfParticles[this.currentParticle] -= 1;
+        }
     }
 
     update(time, timeDelta) {
