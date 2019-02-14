@@ -61,10 +61,19 @@ class GraphicsContext {
     }
 
         createPositiveChargeGradient(  centre, radius){
-            var gradient = this.context.createRadialGradient(centre.x + radius * 0.3, centre.y - radius * 0.3, 5, centre.x, centre.y, radius);
+            var gradient = this.context.createRadialGradient(centre.x + radius * 0.3, centre.y - radius * 0.3, 2, centre.x, centre.y, radius);
 
             gradient.addColorStop(0, "#f9758b");
             gradient.addColorStop(1, "#dd1335");
+
+            return gradient;
+        }
+
+        createNeutralChargeGradient(  centre, radius){
+            var gradient = this.context.createRadialGradient(centre.x + radius * 0.3, centre.y - radius * 0.3, 2, centre.x, centre.y, radius);
+
+            gradient.addColorStop(0, "#eeeeee");
+            gradient.addColorStop(1, "#777777");
 
             return gradient;
         }

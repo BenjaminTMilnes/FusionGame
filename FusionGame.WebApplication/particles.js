@@ -25,6 +25,8 @@ class Particle extends Entity {
 
         this.velocity = new Vector2D();
 
+        this.charge = 0;
+
         this.trail = [];
 
         this.label = "";
@@ -44,11 +46,17 @@ class Particle extends Entity {
     draw(graphics) {
         super.draw(graphics);
 
-        var gradient = graphics.createPositiveChargeGradient(this.centre, this.radius);
+        var gradient = graphics.createNeutralChargeGradient(this.centre, this.radius);
+        var lineColour = "#444444";
 
-        graphics.drawCircle(this.centre, this.radius, gradient, "#7f0217");
+        if (this.charge == 1) {
+            gradient = graphics.createPositiveChargeGradient(this.centre, this.radius);
+            lineColour = "#7f0217";
+        }
 
-        graphics.drawPath(this.trail, "none", "blue");
+        graphics.drawCircle(this.centre, this.radius, gradient, lineColour);
+
+        graphics.drawPath(this.trail, "none", "#cce8ff");
 
         if (this.showLabel) {
             graphics.drawText(this.label, this.centre.translateY(-30));
@@ -63,6 +71,8 @@ class Proton extends Particle {
         super();
 
         this.label = "Proton";
+
+        this.charge = 1;
     }
 }
 
@@ -73,6 +83,8 @@ class Neutron extends Particle {
 
         this.fillColour = "grey";
         this.label = "Neutron";
+
+        this.charge = 0;
     }
 }
 
@@ -81,15 +93,39 @@ class Nucleus extends Entity {
     constructor() {
         super();
 
+        this.showLabel = false;
+
         this.centre = new Vector2D();
 
         this.nucleons = [];
+    }
+
+    update(time, timeDelta) {
+        var u1 = new Vector2D(0, -12);
+
+
+        if (this.nucleons.length == 1) {
+            this.nucleons[0].centre = this.centre;
+        }
+        if (this.nucleons.length == 2) {
+            this.nucleons[0].centre = this.centre.add(u1.rotate(90));
+            this.nucleons[1].centre = this.centre.add(u1.rotate(-90));
+                    }
+        if (this.nucleons.length == 3) {
+            this.nucleons[0].centre = this.centre.add(u1.rotate(120));
+            this.nucleons[1].centre = this.centre.add(u1.rotate(0));
+            this.nucleons[2].centre = this.centre.add(u1.rotate(-120));
+        }
     }
 
     draw(graphics) {
         this.nucleons.forEach(n => {
             n.draw(graphics);
         });
+
+        if (this.showLabel) {
+            graphics.drawText(this.label, this.centre.translateY(-40));
+        }
     }
 }
 
@@ -100,17 +136,49 @@ class Diproton extends Nucleus {
     constructor() {
         super();
 
+        this.label = "Diproton";
+
         this.centre = new Vector2D(200, 200);
 
         this.nucleons.push(new Proton());
         this.nucleons.push(new Proton());
     }
+}
 
-    update(time, timeDelta) {
-        this.nucleons[0].centre = this.centre.translateX(20);
-        this.nucleons[1].centre = this.centre.translateX(-20);
+
+
+
+class DeuteriumNucleus extends Nucleus {
+    constructor() {
+        super();
+
+        this.label = "Deuterium Nucleus";
+
+        this.centre = new Vector2D(200, 200);
+
+        this.nucleons.push(new Proton());
+        this.nucleons.push(new Neutron());
     }
 }
+
+
+
+
+
+class Helium3Nucleus extends Nucleus {
+    constructor() {
+        super();
+
+        this.label = "Helium-3 Nucleus";
+
+        this.centre = new Vector2D(200, 200);
+
+        this.nucleons.push(new Proton());
+        this.nucleons.push(new Proton());
+        this.nucleons.push(new Neutron());
+    }
+}
+
 
 
 

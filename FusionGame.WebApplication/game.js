@@ -35,7 +35,7 @@ class Game {
         this.graphics = new GraphicsContext(this.context);
 
         this.targetPosition = new Vector2D(this.areaWidth / 2, this.areaHeight * 0.2);
-        this.target = new Proton();
+        this.target = new Helium3Nucleus();
         this.target.centre = this.targetPosition;
         this.target.showLabel = true;
           
@@ -45,9 +45,13 @@ class Game {
     update(timeDelta) {
         this.time += timeDelta;
 
+        this.entities = this.entities.filter(e => e.centre.y > -200 && e.centre.y < 2000 && e.centre.x > -200 && e.centre.x < 4000);
+        
         for (let e of this.entities) {
             e.update(   this.time, timeDelta);
         }
+
+        this.target.update(this.time, timeDelta);
     }
 
     keyDown(e) {
