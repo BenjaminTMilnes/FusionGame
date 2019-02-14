@@ -40,7 +40,7 @@ class Game {
         this.target.centre = this.targetPosition;
         this.target.showLabel = true;
 
-        this.chamber = new Chamber();
+        this.chamber = new Chamber( this);
         this.chamber.position = new Vector2D(this.areaWidth / 2, this.areaHeight * 0.8);
 
     }
@@ -59,19 +59,8 @@ class Game {
         this.chamber.update(this.time, timeDelta);
     }
 
-    keyDown(e) {
-        if (e.code == "ArrowUp" || e.code == "Space") {
-
-            var e1 = new Vector2D(this.areaWidth / 2, this.areaHeight * 0.8);
-
-            var p = new Proton();
-
-            p.centre = e1;
-            p.velocity.x = Math.random() * 100 - 50;
-            p.velocity.y = -1000;
-
-            this.entities.push(p);
-        }
+    keyDown(e) {  
+        this.chamber.keyDown(e);
     }
 
 

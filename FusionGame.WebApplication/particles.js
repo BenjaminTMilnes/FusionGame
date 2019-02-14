@@ -28,6 +28,7 @@ class Particle extends Entity {
         this.charge = 0;
 
         this.trail = [];
+        this.showTrail = false;
 
         this.label = "";
         this.showLabel = false;
@@ -38,7 +39,9 @@ class Particle extends Entity {
             this.trail.shift();
         }
 
-        this.trail.push(this.centre);
+        if (this.showTrail) {
+            this.trail.push(this.centre);
+        }
 
         this.centre = this.centre.add(this.velocity.times(timeDelta / 1000));
     }
@@ -54,9 +57,16 @@ class Particle extends Entity {
             lineColour = "#7f0217";
         }
 
+        if (this.charge == -1) {
+            gradient = graphics.createNegativeChargeGradient(this.centre, this.radius);
+            lineColour = "#04437c";
+        }
+
         graphics.drawCircle(this.centre, this.radius, gradient, lineColour);
 
-        graphics.drawPath(this.trail, "none", "#cce8ff");
+        if (this.showTrail) {
+            graphics.drawPath(this.trail, "none", "#cce8ff");
+        }
 
         if (this.showLabel) {
             graphics.drawText(this.label, this.centre.translateY(-30));
@@ -89,6 +99,19 @@ class Neutron extends Particle {
 }
 
 
+
+class Electron extends Particle {
+    constructor() {
+        super();
+
+        this.label = "Electron";
+
+        this.charge = -1;
+        this.radius = 5;
+    }
+}
+
+
 class Nucleus extends Entity {
     constructor() {
         super();
@@ -96,12 +119,31 @@ class Nucleus extends Entity {
         this.showLabel = false;
 
         this.centre = new Vector2D();
+        this.orientation = 0;
+
+        this.velocity = new Vector2D();
+
+
+        this.trail = [];
+        this.showTrail = false;
 
         this.nucleons = [];
     }
 
     update(time, timeDelta) {
+        if (this.trail.length > 5) {
+            this.trail.shift();
+        }
+
+        if (this.showTrail) {
+            this.trail.push(this.centre);
+        }
+
+        this.centre = this.centre.add(this.velocity.times(timeDelta / 1000));
+
         var u1 = new Vector2D(0, -12);
+
+        u1 = u1.rotate(this.orientation);
 
 
         if (this.nucleons.length == 1) {
@@ -128,6 +170,11 @@ class Nucleus extends Entity {
         this.nucleons.forEach(n => {
             n.draw(graphics);
         });
+
+        if (this.showTrail) {
+
+            graphics.drawPath(this.trail, "none", "#cce8ff");
+        }
 
         if (this.showLabel) {
             graphics.drawText(this.label, this.centre.translateY(-50));
@@ -225,10 +272,13 @@ class Helium4Nucleus extends Nucleus {
 
 
 class Chamber extends Entity {
-    constructor() {
+    constructor(game) {
         super();
 
-        this.particles = [Proton, DeuteriumNucleus, TritiumNucleus, Helium3Nucleus, Helium4Nucleus];
+        this.game = game;
+
+        this.particles = [ Electron,  Proton, DeuteriumNucleus, TritiumNucleus, Helium3Nucleus, Helium4Nucleus];
+        this.currentParticle = 1;
 
         this.entities = [];
 
@@ -241,11 +291,50 @@ class Chamber extends Entity {
         }
     }
 
+    keyDown(e) {
+        if (e.code == "ArrowLeft") {
+            this.changeLeft();
+        }
+        if (e.code == "ArrowRight") {
+            this.changeRight();
+        }
+        if (e.code == "ArrowUp" || e.code == "Space") {
+            this.fireParticle();
+       
+        }
+    }
+
+    changeRight() {
+        if (this.currentParticle < this.particles.length - 1) {
+            this.currentParticle += 1;
+        }
+    }
+
+    changeLeft() {
+        if (this.currentParticle > 0) {
+            this.currentParticle -= 1;
+        }
+    }
+
+    fireParticle() {
+        var e1 = new Vector2D(this.game.areaWidth / 2, this.game.areaHeight * 0.8);
+
+        var p = new this.particles[this.currentParticle]();
+
+        p.centre = e1;
+        p.orientation = Math.round(Math.random() * 360);
+        p.velocity.x = Math.random() * 100 - 50;
+        p.velocity.y = -1000;
+        p.showTrail = true;
+
+        this.game.entities.push(p);
+    }
+
     update(time, timeDelta) {
         this.entities.forEach(e => {
             var i = this.entities.indexOf(e);
 
-          e.centre = this.position.translateX(i * 150);
+          e.centre = this.position.translateX((i - this.currentParticle) * 150);
 
             e.update(time, timeDelta);
         });
