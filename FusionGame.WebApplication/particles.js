@@ -1,8 +1,4 @@
 ﻿
-
-
-
-
 class Entity {
     constructor() {
         this.z = 0;
@@ -12,8 +8,6 @@ class Entity {
 
     draw(graphics) { }
 }
-
-
 
 class Particle extends Entity {
     constructor() {
@@ -56,6 +50,10 @@ class Particle extends Entity {
     draw(graphics) {
         super.draw(graphics);
 
+        if (this.showTrail) {
+            graphics.drawPath(this.trail, "none", "#cce8ff");
+        }
+
         var gradient = graphics.createNeutralChargeGradient(this.centre, this.radius);
         var lineColour = "#444444";
 
@@ -71,28 +69,22 @@ class Particle extends Entity {
 
         graphics.drawCircle(this.centre, this.radius, gradient, lineColour);
 
-        if (this.showTrail) {
-            graphics.drawPath(this.trail, "none", "#cce8ff");
-        }
-
         if (this.showLabel) {
             graphics.drawText(this.label, this.centre.translateY(-30));
         }
     }
 }
 
-
-
 class Proton extends Particle {
     constructor() {
         super();
 
-        this.label = "Proton";
+        this.type = "Proton";
+             this.label = "Proton";
 
         this.charge = 1;
     }
 }
-
 
 class Neutron extends Particle {
     constructor() {
@@ -105,8 +97,6 @@ class Neutron extends Particle {
     }
 }
 
-
-
 class Electron extends Particle {
     constructor() {
         super();
@@ -115,9 +105,21 @@ class Electron extends Particle {
 
         this.charge = -1;
         this.radius = 5;
+        this.mass = 0.1;
     }
 }
 
+class Positron extends Particle {
+    constructor() {
+        super();
+
+        this.label = "Positron";
+
+        this.charge = 1;
+        this.radius = 5;
+        this.mass = 0.1;
+    }
+}
 
 class Nucleus extends Entity {
     constructor() {
@@ -128,6 +130,8 @@ class Nucleus extends Entity {
         this.centre = new Vector2D();
         this.orientation = 0;
 
+        this.force = new Vector2D();
+        this.acceleration = new Vector2D();
         this.velocity = new Vector2D();
 
 
@@ -147,6 +151,16 @@ class Nucleus extends Entity {
         return q;
     }
 
+    get mass() {
+        var m = 0;
+
+        this.nucleons.forEach(n => {
+            m += n.mass;
+        });
+
+        return m;
+    }
+
     update(time, timeDelta) {
         if (this.trail.length > 5) {
             this.trail.shift();
@@ -155,6 +169,10 @@ class Nucleus extends Entity {
         if (this.showTrail) {
             this.trail.push(this.centre);
         }
+
+        this.acceleration = this.force.times(1 / this.mass);
+
+        this.velocity = this.velocity.add(this.acceleration.times(timeDelta / 1000));
 
         this.centre = this.centre.add(this.velocity.times(timeDelta / 1000));
 
@@ -184,14 +202,13 @@ class Nucleus extends Entity {
     }
 
     draw(graphics) {
+        if (this.showTrail) {
+            graphics.drawPath(this.trail, "none", "#cce8ff");
+        }
+
         this.nucleons.forEach(n => {
             n.draw(graphics);
         });
-
-        if (this.showTrail) {
-
-            graphics.drawPath(this.trail, "none", "#cce8ff");
-        }
 
         if (this.showLabel) {
             graphics.drawText(this.label, this.centre.translateY(-50));
@@ -199,13 +216,11 @@ class Nucleus extends Entity {
     }
 }
 
-
-
-
 class Diproton extends Nucleus {
     constructor() {
         super();
 
+        this.type = "Diproton";
         this.label = "Diproton";
 
         this.centre = new Vector2D(200, 200);
@@ -214,9 +229,6 @@ class Diproton extends Nucleus {
         this.nucleons.push(new Proton());
     }
 }
-
-
-
 
 class DeuteriumNucleus extends Nucleus {
     constructor() {
@@ -230,9 +242,6 @@ class DeuteriumNucleus extends Nucleus {
         this.nucleons.push(new Neutron());
     }
 }
-
-
-
 
 class TritiumNucleus extends Nucleus {
     constructor() {
@@ -248,12 +257,6 @@ class TritiumNucleus extends Nucleus {
     }
 }
 
-
-
-
-
-
-
 class Helium3Nucleus extends Nucleus {
     constructor() {
         super();
@@ -267,8 +270,6 @@ class Helium3Nucleus extends Nucleus {
         this.nucleons.push(new Neutron());
     }
 }
-
-
 
 class Helium4Nucleus extends Nucleus {
     constructor() {
@@ -285,9 +286,6 @@ class Helium4Nucleus extends Nucleus {
     }
 }
 
-
-
-
 class Chamber extends Entity {
     constructor(game) {
         super();
@@ -297,7 +295,7 @@ class Chamber extends Entity {
         this.particles = [ Electron,  Proton, DeuteriumNucleus, TritiumNucleus, Helium3Nucleus, Helium4Nucleus];
         this.currentParticle = 1;
 
-        this.numbersOfParticles = [100, 100, 10, 10, 10, 10];
+        this.numbersOfParticles = [100, 10000, 10, 10, 10, 10];
 
         this.entities = [];
 
@@ -318,8 +316,7 @@ class Chamber extends Entity {
             this.changeRight();
         }
         if (e.code == "ArrowUp" || e.code == "Space") {
-            this.fireParticle();
-       
+            this.fireParticle();       
         }
     }
 
@@ -335,7 +332,7 @@ class Chamber extends Entity {
         }
     }
 
-    fireParticle() {
+    fireParticle( speed = 1000, variance = 50) {
         if (this.numbersOfParticles[this.currentParticle] > 0) {
             var e1 = new Vector2D(this.game.areaWidth / 2, this.game.areaHeight * 0.8);
 
@@ -343,15 +340,15 @@ class Chamber extends Entity {
 
             p.centre = e1;
             p.orientation = Math.round(Math.random() * 360);
-            p.velocity.x = Math.random() * 200 - 100;
-            p.velocity.y = -1000;
+            p.velocity.x =( Math.random() - 0.5) * 2*variance ;
+            p.velocity.y = -1 * speed;
             p.showTrail = true;
 
             this.game.entities.push(p);
 
             this.numbersOfParticles[this.currentParticle] -= 1;
         }
-    }
+    }     
 
     update(time, timeDelta) {
         this.entities.forEach(e => {
@@ -368,10 +365,5 @@ class Chamber extends Entity {
 
     }
 }
-
-
-
-
-
 
 

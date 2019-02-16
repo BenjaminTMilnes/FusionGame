@@ -1,10 +1,4 @@
 ﻿
-
-
-
-
-
-
 class Game {
     constructor(canvasId) {
         this.canvasId = canvasId;
@@ -36,56 +30,145 @@ class Game {
         this.graphics = new GraphicsContext(this.context);
 
         this.targetPosition = new Vector2D(this.areaWidth / 2, this.areaHeight * 0.2);
-        this.target = new Helium3Nucleus();
+        this.target =  new Proton();
         this.target.centre = this.targetPosition;
         this.target.showLabel = true;
 
         this.chamber = new Chamber( this);
         this.chamber.position = new Vector2D(this.areaWidth / 2, this.areaHeight * 0.8);
 
+        this.lastFuse = 0;
+
+    }
+
+    isPointOutsideGameBoundary(p) {
+        var margin = 100;
+
+        return p.x < -margin || p.x > this.canvas.width + margin || p.y < -margin || p.y > this.canvas.height + margin;
+    }
+
+    isPointInsideGameBoundary(p) {
+        return !this.isPointOutsideGameBoundary(p);
+    }
+
+    removeDistantParticles() {
+        for (var i = 0; i < this.entities.length; i++) {
+            var entity = this.entities[i];
+
+            if (this.isPointOutsideGameBoundary(entity.centre)) {
+                this.entities.splice(i, 1);
+            }
+        }
+
+        console.log(this.entities.length);
     }
 
     update(timeDelta) {
         this.time += timeDelta;
 
-        this.entities = this.entities.filter(e => e.centre.y > -200 && e.centre.y < 2000 && e.centre.x > -200 && e.centre.x < 4000);
+        this.removeDistantParticles();
 
         for (let e of this.entities) {
             e.force = new Vector2D();
 
             for (let g of this.entities) {
-                var r = ds(e.centre, g.centre);
+                var f = this.calculateElectrostaticForce(e, g);
 
-                if (r > 5 && !isNaN(r)) {
-                    var u = e.centre.subtract(g.centre).u;
-                    var f = 100 * e.charge * g.charge / Math.pow(r, 2);
-
-                    e.force = e.force.add(u.times(f));
-                }
-
+            e.force = e.force.add(f);               
             }
+
+            var f = this.calculateElectrostaticForce(e, this.target);
+
+            e.force = e.force.add(f);
+
             var r = ds(e.centre, this.target.centre);
 
-            if (r > 5 && !isNaN(r)) {
-                var u = e.centre.subtract(this.target.centre).u;
-                var f = 80000 * e.charge * this.target.charge / Math.pow(r, 2);
-
-                e.force = e.force.add(u.times(f));
+            if (r < 10) {
+                this.attemptFuse(e);
             }
-
-
+            
             e.update(this.time, timeDelta);
         }
 
-        this.target.update(this.time, timeDelta);
+        this.attemptDecay();
 
+        this.target.update(this.time, timeDelta);
         this.chamber.update(this.time, timeDelta);
+    }
+
+    calculateElectrostaticForce(particle1, particle2) {
+        var coulombConstant = 90000;
+        var minimumInteractionDistance = 3;
+
+        var r = ds(particle1.centre, particle2.centre);
+
+        if (r > minimumInteractionDistance) {
+            var u = particle1.centre.subtract(particle2.centre).u;
+            var f = coulombConstant * particle1.charge * particle2.charge / Math.pow(r, 2);
+
+            return u.times(f);
+        }
+        else {
+            return new Vector2D();
+        }
+    }
+
+    attemptFuse(particle) {
+
+        if (particle.type == "Proton" && this.target.type == "Proton" && Math.random() < 0.2) {
+            this.target = new Diproton();
+
+            particle.centre.y = -2000;
+            particle.velocity = new Vector2D();
+
+            this.lastFuse = this.time;
+        }
+
+        this.target.centre = this.targetPosition;
+        this.target.showLabel = true;
+
+    }
+
+    attemptDecay() {
+
+        if (this.time - this.lastFuse < 500) {
+            return;
+        }
+
+        if (this.target.type == "Diproton" && Math.random() < 0.5) {
+            this.target = new Proton();
+
+            var p = new Proton();
+
+            p.centre = this.targetPosition.translateY(-15);
+            p.velocity.x = Math.random() * 1000 - 500;
+            p.velocity.y = Math.random() * 10 - 5;
+
+            this.entities.push(p);
+
+        }
+
+        if (this.target.type == "Diproton" && Math.random() < 0.05) {
+            this.target = new DeuteriumNucleus();
+
+            var p = new Positron();
+
+            p.centre = this.targetPosition.translateY(-15);
+            p.velocity.x = Math.random() * 1000 - 500;
+            p.velocity.y = Math.random() * 10 - 5;
+
+            this.entities.push(p);
+
+        }
+
+        this.target.centre = this.targetPosition;
+        this.target.showLabel = true;
+
     }
 
     keyDown(e) {  
         this.chamber.keyDown(e);
     }
-
 
     keyUp(e) {
     }
