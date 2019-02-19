@@ -235,6 +235,7 @@ class DeuteriumNucleus extends Nucleus {
         super();
 
         this.label = "Deuterium Nucleus";
+        this.type = "Deuterium Nucleus";
 
         this.centre = new Vector2D(200, 200);
 
@@ -262,6 +263,7 @@ class Helium3Nucleus extends Nucleus {
         super();
 
         this.label = "Helium-3 Nucleus";
+        this.type = "Helium-3 Nucleus";
 
         this.centre = new Vector2D(200, 200);
 
