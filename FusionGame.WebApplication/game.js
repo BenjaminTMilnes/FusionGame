@@ -41,7 +41,8 @@ class Game {
 
         this.fusionReactions = [
             ["p+", "p+", 0.9, "2,2 He", []],
-            ["1,2 H", "p+", 0.9, "1,3 H", []]
+            ["1,2 H", "p+", 0.9, "2,3 He", []],
+            ["2,3 He", "2,3 He", 0.9, "2,4 He", ["p+", "p+"]]
         ];
 
         this.decayReactions = [
@@ -82,8 +83,6 @@ class Game {
                 this.entities.splice(i, 1);
             }
         }
-
-        console.log(this.entities.length);
     }
 
     update(timeDelta) {
@@ -126,10 +125,10 @@ class Game {
         var r = ds(particle1.centre, particle2.centre);
 
         if (r > minimumInteractionDistance) {
-            var u = particle1.centre.subtract(particle2.centre).u;
+            var u = particle2.centre.subtract(particle1.centre).u;
             var f = coulombConstant * particle1.charge * particle2.charge / Math.pow(r, 2);
 
-            return u.times(f);
+            return u.times(-f);
         }
         else {
             return new Vector2D();
@@ -207,6 +206,12 @@ class Game {
 
             this.entities.push(p);
         });
+    }
+
+    resetTarget() {
+        this.target = this.getParticleByType("p+");
+        this.target.centre = this.targetPosition;
+        this.target.showLabel = true;
     }
 
     keyDown(e) {  

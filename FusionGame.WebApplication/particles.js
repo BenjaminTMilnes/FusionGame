@@ -325,6 +325,8 @@ class Chamber extends Entity {
         }
         if (e.code == "ArrowUp" || e.code == "Space") {
             this.fireParticle();       
+        }    if (e.code == "Enter") {
+            this.storeParticle();
         }
     }
 
@@ -342,7 +344,7 @@ class Chamber extends Entity {
 
     fireParticle( speed = 1000, variance = 50) {
         if (this.numbersOfParticles[this.currentParticle] > 0) {
-            var e1 = new Vector2D(this.game.areaWidth / 2, this.game.areaHeight * 0.8);
+            var e1 = new Vector2D(this.game.areaWidth / 2, this.game.areaHeight * 0.65);
 
             var p = new this.particles[this.currentParticle]();
 
@@ -356,7 +358,20 @@ class Chamber extends Entity {
 
             this.numbersOfParticles[this.currentParticle] -= 1;
         }
-    }     
+    }  
+
+        storeParticle(){
+            var type =  this.game.target.type;
+            
+            for (var i = 0; i < this.entities.length; i++)   {
+                if (this.entities[i].type == type){
+                    this.numbersOfParticles[i] += 1;
+
+                    this.game.resetTarget();
+                }
+            }
+        }
+
 
     update(time, timeDelta) {
         this.entities.forEach(e => {
