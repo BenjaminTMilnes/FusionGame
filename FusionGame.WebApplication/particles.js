@@ -107,7 +107,7 @@ class Electron extends Particle {
 
         this.charge = -1;
         this.radius = 5;
-        this.mass = 0.1;
+        this.mass = 0.3;
     }
 }
 
@@ -120,7 +120,7 @@ class Positron extends Particle {
 
         this.charge = 1;
         this.radius = 5;
-        this.mass = 0.1;
+        this.mass = 0.3;
     }
 }
 
