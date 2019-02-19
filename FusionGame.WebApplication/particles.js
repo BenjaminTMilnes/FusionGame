@@ -79,8 +79,8 @@ class Proton extends Particle {
     constructor() {
         super();
 
-        this.type = "Proton";
-             this.label = "Proton";
+        this.label = "Proton";
+        this.type = "p+";
 
         this.charge = 1;
     }
@@ -92,6 +92,7 @@ class Neutron extends Particle {
 
         this.fillColour = "grey";
         this.label = "Neutron";
+        this.type = "n";
 
         this.charge = 0;
     }
@@ -102,6 +103,7 @@ class Electron extends Particle {
         super();
 
         this.label = "Electron";
+        this.type = "e-";
 
         this.charge = -1;
         this.radius = 5;
@@ -114,6 +116,7 @@ class Positron extends Particle {
         super();
 
         this.label = "Positron";
+        this.type = "e+";
 
         this.charge = 1;
         this.radius = 5;
@@ -219,15 +222,14 @@ class Nucleus extends Entity {
 class Diproton extends Nucleus {
     constructor() {
         super();
-
-        this.type = "Diproton";
+        
         this.label = "Diproton";
-
+        this.type = "2,2 He";
+        
         this.centre = new Vector2D(200, 200);
 
         this.nucleons.push(new Proton());
-        this.nucleons.push(new Proton());
-    }
+        this.nucleons.push(new Proton());}
 }
 
 class DeuteriumNucleus extends Nucleus {
@@ -235,8 +237,8 @@ class DeuteriumNucleus extends Nucleus {
         super();
 
         this.label = "Deuterium Nucleus";
-        this.type = "Deuterium Nucleus";
-
+        this.type = "1,2 H";
+    
         this.centre = new Vector2D(200, 200);
 
         this.nucleons.push(new Proton());
@@ -249,7 +251,8 @@ class TritiumNucleus extends Nucleus {
         super();
 
         this.label = "Tritium Nucleus";
-
+        this.type = "1,3 H";
+   
         this.centre = new Vector2D(200, 200);
 
         this.nucleons.push(new Proton());
@@ -263,14 +266,14 @@ class Helium3Nucleus extends Nucleus {
         super();
 
         this.label = "Helium-3 Nucleus";
-        this.type = "Helium-3 Nucleus";
-
+        this.type = "2,3 He";
+  
         this.centre = new Vector2D(200, 200);
 
         this.nucleons.push(new Proton());
         this.nucleons.push(new Proton());
         this.nucleons.push(new Neutron());
-    }
+    }    
 }
 
 class Helium4Nucleus extends Nucleus {
@@ -278,14 +281,15 @@ class Helium4Nucleus extends Nucleus {
         super();
 
         this.label = "Helium-4 Nucleus";
-
+        this.type = "2,4 He";
+   
         this.centre = new Vector2D(200, 200);
 
         this.nucleons.push(new Proton());
         this.nucleons.push(new Neutron());
         this.nucleons.push(new Proton());
         this.nucleons.push(new Neutron());
-    }
+    }  
 }
 
 class Chamber extends Entity {
@@ -297,14 +301,16 @@ class Chamber extends Entity {
         this.particles = [ Electron,  Proton, DeuteriumNucleus, TritiumNucleus, Helium3Nucleus, Helium4Nucleus];
         this.currentParticle = 1;
 
-        this.numbersOfParticles = [100, 10000, 10, 10, 10, 10];
+        this.numbersOfParticles = [100, 10000, 0, 0, 0, 0];
+
+        this.particleSpacing = 170;
 
         this.entities = [];
 
         for (var i = 0; i < this.particles.length; i++) {
             var p = new this.particles[i]();
 
-            p.showLabel = true;
+            p.showLabel = false;
 
             this.entities.push(p);
         }
@@ -356,7 +362,7 @@ class Chamber extends Entity {
         this.entities.forEach(e => {
             var i = this.entities.indexOf(e);
 
-          e.centre = this.position.translateX((i - this.currentParticle) * 150);
+          e.centre = this.position.translateX((i - this.currentParticle) * this.particleSpacing);
 
             e.update(time, timeDelta);
         });
@@ -364,6 +370,17 @@ class Chamber extends Entity {
 
     draw(graphics) {
         this.entities.forEach(e => { e.draw(graphics); });
+
+        for (var i = 0; i < this.entities.length; i++){
+            var j = i + this.currentParticle;
+
+            var c = (this.numbersOfParticles[i] == 0)? "#C0C0C0":"black";
+
+            graphics.drawText( this.entities[i].label, this.entities[i].centre.translateY(-70), "middlecentre" , "Times New Roman" , 20 , c);
+
+            graphics.drawText( this.numbersOfParticles[i], this.entities[i].centre.translateY(70), "middlecentre" , "Times New Roman" , 20 , c);
+
+        }
 
     }
 }

@@ -30,14 +30,37 @@ class Game {
         this.graphics = new GraphicsContext(this.context);
 
         this.targetPosition = new Vector2D(this.areaWidth / 2, this.areaHeight * 0.2);
-        this.target =  new Proton();
+        this.target = new Proton();
         this.target.centre = this.targetPosition;
         this.target.showLabel = true;
 
-        this.chamber = new Chamber( this);
+        this.chamber = new Chamber(this);
         this.chamber.position = new Vector2D(this.areaWidth / 2, this.areaHeight * 0.8);
 
         this.lastFuse = 0;
+
+        this.fusionReactions = [
+            ["p+", "p+", 0.9, "2,2 He", []],
+            ["1,2 H", "p+", 0.9, "1,3 H", []]
+        ];
+
+        this.decayReactions = [
+            ["2,2 He", 0.2, "p+", ["p+"]],
+            ["2,2 He", 0.9, "1,2 H", ["e+"]],
+            ["1,3 H", 0.9, "2,3 He", ["e-"]]
+        ];
+
+        this.particles = [
+            [new Proton(), Proton],
+            [new Neutron(), Neutron],
+            [new Electron(), Electron],
+            [new Positron(), Positron],
+            [new Diproton(), Diproton],
+            [new DeuteriumNucleus(), DeuteriumNucleus],
+            [new TritiumNucleus(), TritiumNucleus],
+            [new Helium3Nucleus(), Helium3Nucleus],
+            [new Helium4Nucleus(), Helium4Nucleus]
+        ];
 
     }
 
@@ -113,94 +136,83 @@ class Game {
         }
     }
 
+    getParticleByType(type) {
+        return new (this.particles.filter(p => p[0].type == type)[0][1])();
+    }
+
     attemptFuse(particle) {
 
-        if (particle.type == "Proton" && this.target.type == "Proton" && Math.random() < 0.9) {
-            this.target = new Diproton();
+        var hasFused = false;
 
-            particle.centre.y = -2000;
-            particle.velocity = new Vector2D();
+        this.fusionReactions.forEach(reaction => {
+            if (this.target.type == reaction[0] && particle.type == reaction[1] && Math.random() < reaction[2] && !hasFused) {
+                this.target = this.getParticleByType(reaction[3]);
 
-            this.lastFuse = this.time;
-        }
-        else if (particle.type == "Proton" && this.target.type == "Deuterium Nucleus" && Math.random() < 0.9) {
-            this.target = new Helium3Nucleus();
+                this.target.centre = this.targetPosition;
+                this.target.showLabel = true;
 
-            particle.centre.y = -2000;
-            particle.velocity = new Vector2D();
+                particle.centre.y = -2000;
+                particle.velocity = new Vector2D();
 
-            this.lastFuse = this.time;
-        }
-        else if (particle.type == "Helium-3 Nucleus" && this.target.type == "Helium-3 Nucleus" && Math.random() < 0.9) {
-            this.target = new Helium4Nucleus();
+                var u1 = new Vector2D(0, 15);
 
-            particle.centre.y = -2000;
-            particle.velocity = new Vector2D();
+                for (var i = 0; i < reaction[4].length; i++) {
+                    u1 = u1.rotate(Math.random() * 360);
 
-            var r1 = new RotationMatrix2D(Math.random() * 360);
-            var u1 = new Vector2D(0, 15);
+                    var p = this.getParticleByType(reaction[4][i]);
 
-            for (var i = 0; i < 2; i++) {
+                    p.centre = this.targetPosition.add(u1);
+                    p.velocity = u1.times(Math.random() * 100 + 100);
 
-                var p = new Proton();
+                    this.entities.push(p);
+                }
 
-                p.centre = this.targetPosition.add(r1.times(u1));
-                p.velocity = r1.times(u1).times(Math.random() * 100);
-
-                this.entities.push(p);
+                this.lastFuse = this.time;
+                this.hasFused = true;
             }
-
-            this.lastFuse = this.time;
-        }
-
-        this.target.centre = this.targetPosition;
-        this.target.showLabel = true;
-
+        });
     }
 
     attemptDecay() {
-
-        var r1 = new RotationMatrix2D(Math.random() * 360);
-        var u1 = new Vector2D(0, 15);
         var products = [];
-
 
         if (this.time - this.lastFuse < 500) {
             return;
         }
 
-        if (this.target.type == "Diproton" && Math.random() < 0.5) {
-            this.target = new Proton();
+        var hasDecayed = false;
 
-            var p = new Proton();
+        this.decayReactions.forEach(reaction => {
+            if (this.target.type == reaction[0] && Math.random() < reaction[1] && ! hasDecayed) {
+                this.target = this.getParticleByType(reaction[2]);
 
-            products.push(p);
-        }
+                this.target.centre = this.targetPosition;
+                this.target.showLabel = true;
 
-        if (this.target.type == "Diproton" && Math.random() < 0.5) {
-            this.target = new DeuteriumNucleus();
+                reaction[3].forEach(product => {
+                    products.push(this.getParticleByType(product));
+                });
 
-            var p = new Positron();
-
-            products.push(p);
-        }
-
-        products.forEach(p => {
-
-            p.centre = this.targetPosition.add(r1.times(u1));
-            p.velocity = r1.times(u1).times(Math.random() * 100);
-
-            this.entities.push(p);
-
+                hasDecayed = true;
+            }
         });
 
-        this.target.centre = this.targetPosition;
-        this.target.showLabel = true;
+        var u1 = new Vector2D(0, 15);
 
+        products.forEach(p => {
+            u1 = u1.rotate(Math.random() * 360);
+
+            p.centre = this.targetPosition.add(u1);
+            p.velocity =  u1.times(Math.random() * 100 + 100);
+
+            this.entities.push(p);
+        });
     }
 
     keyDown(e) {  
         this.chamber.keyDown(e);
+
+        e.preventDefault();
     }
 
     keyUp(e) {
