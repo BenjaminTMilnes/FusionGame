@@ -42,13 +42,20 @@ class Game {
         this.fusionReactions = [
             ["p+", "p+", 0.9, "2,2 He", []],
             ["1,2 H", "p+", 0.9, "2,3 He", []],
-            ["2,3 He", "2,3 He", 0.9, "2,4 He", ["p+", "p+"]]
+            ["2,3 He", "2,3 He", 0.9, "2,6 He", []],
+            ["2,3 He", "2,4 He", 0.9, "4,7 Be", []],
+            ["4,7 Be", "e-", 0.9, "3,7 Li", []],
+            ["3,7 Li", "p+", 0.9, "4,8 Be", []]
         ];
 
         this.decayReactions = [
             ["2,2 He", 0.2, "p+", ["p+"]],
             ["2,2 He", 0.9, "1,2 H", ["e+"]],
-            ["1,3 H", 0.9, "2,3 He", ["e-"]]
+            ["1,3 H", 0.9, "2,3 He", ["e-"]],
+            ["2,5 He", 0.5, "2,4 He", ["n"]],
+            ["2,6 He", 0.9, "2,4 He", ["p+", "p+"]],
+            ["2,7 He", 0.9, "2,6 He", ["n"]],
+            ["4,8 Be", 0.1, "2,4 He", ["2,4 He"]]
         ];
 
         this.particles = [
@@ -60,7 +67,13 @@ class Game {
             [new DeuteriumNucleus(), DeuteriumNucleus],
             [new TritiumNucleus(), TritiumNucleus],
             [new Helium3Nucleus(), Helium3Nucleus],
-            [new Helium4Nucleus(), Helium4Nucleus]
+            [new Helium4Nucleus(), Helium4Nucleus],
+            [new Helium5Nucleus(), Helium5Nucleus],
+            [new Helium6Nucleus(), Helium6Nucleus],
+            [new Helium7Nucleus(), Helium7Nucleus],
+            [new Lithium7Nucleus(), Lithium7Nucleus],
+            [new Beryllium7Nucleus(), Beryllium7Nucleus],
+            [new Beryllium8Nucleus(), Beryllium8Nucleus]
         ];
 
     }
@@ -144,7 +157,7 @@ class Game {
         var hasFused = false;
 
         this.fusionReactions.forEach(reaction => {
-            if (this.target.type == reaction[0] && particle.type == reaction[1] && Math.random() < reaction[2] && !hasFused) {
+            if (((this.target.type == reaction[0] && particle.type == reaction[1]) || (this.target.type == reaction[1] && particle.type == reaction[0])) && Math.random() < reaction[2] && !hasFused) {
                 this.target = this.getParticleByType(reaction[3]);
 
                 this.target.centre = this.targetPosition;

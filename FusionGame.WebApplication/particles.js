@@ -192,15 +192,39 @@ class Nucleus extends Entity {
             this.nucleons[1].centre = this.centre.add(u1.rotate(-90));
                     }
         if (this.nucleons.length == 3) {
-            this.nucleons[0].centre = this.centre.add(u1.rotate(120));
-            this.nucleons[1].centre = this.centre.add(u1.rotate(0));
-            this.nucleons[2].centre = this.centre.add(u1.rotate(-120));
+            for (var i = 0; i < 3; i++){
+                this.nucleons[i].centre = this.centre.add(u1.rotate(i*120));
+            }   
         }
         if (this.nucleons.length == 4) {
-            this.nucleons[0].centre = this.centre.add(u1.times(1.2).rotate(90));
-            this.nucleons[1].centre = this.centre.add(u1.times(1.2).rotate(0));
-            this.nucleons[2].centre = this.centre.add(u1.times(1.2).rotate(-90));
-            this.nucleons[3].centre = this.centre.add(u1.times(1.2).rotate(180));
+            for (var i = 0; i < 4; i++){
+                this.nucleons[i].centre = this.centre.add(u1.times(1.2).rotate(i*90));
+            }   
+        }
+        if (this.nucleons.length == 5) {
+            for (var i = 0; i < 5; i++){
+                this.nucleons[i].centre = this.centre.add(u1.times(1.2).rotate(i*72));
+            }   
+        }
+        if (this.nucleons.length == 6) {
+              for (var i = 0; i < 5; i++){
+                this.nucleons[i].centre = this.centre.add(u1.times(1.4).rotate(i*72));
+            }   
+            this.nucleons[5].centre = this.centre;
+        }
+        if (this.nucleons.length == 7) {
+            for (var i = 0; i < 6; i++){
+                this.nucleons[i].centre = this.centre.add(u1.times(1.4).rotate(i*60));
+            }         
+            this.nucleons[6].centre = this.centre;
+        }
+        if (this.nucleons.length == 8) {
+            for (var i = 0; i < 5; i++){
+                this.nucleons[i].centre = this.centre.add(u1.times(1.7).rotate(i*72));
+            }   
+            for (var i = 5; i < 8; i++){
+                this.nucleons[i].centre = this.centre.add(u1.times(1).rotate(i*120));
+            } 
         }
     }
 
@@ -285,6 +309,118 @@ class Helium4Nucleus extends Nucleus {
    
         this.centre = new Vector2D(200, 200);
 
+        this.nucleons.push(new Proton());
+        this.nucleons.push(new Neutron());
+        this.nucleons.push(new Proton());
+        this.nucleons.push(new Neutron());
+    }  
+}
+
+class Helium5Nucleus extends Nucleus {
+    constructor() {
+        super();
+
+        this.label = "Helium-5 Nucleus";
+        this.type = "2,5 He";
+   
+        this.centre = new Vector2D(200, 200);
+
+        this.nucleons.push(new Proton());
+        this.nucleons.push(new Neutron());
+        this.nucleons.push(new Proton());
+        this.nucleons.push(new Neutron());
+        this.nucleons.push(new Neutron());
+    }  
+}
+
+class Helium6Nucleus extends Nucleus {
+    constructor() {
+        super();
+
+        this.label = "Helium-6 Nucleus";
+        this.type = "2,6 He";
+   
+        this.centre = new Vector2D(200, 200);
+
+        this.nucleons.push(new Proton());
+        this.nucleons.push(new Neutron());
+        this.nucleons.push(new Neutron());
+        this.nucleons.push(new Proton());
+        this.nucleons.push(new Neutron());
+        this.nucleons.push(new Neutron());
+    }  
+}
+
+class Helium7Nucleus extends Nucleus {
+    constructor() {
+        super();
+
+        this.label = "Helium-7 Nucleus";
+        this.type = "2,7 He";
+   
+        this.centre = new Vector2D(200, 200);
+
+        this.nucleons.push(new Proton());
+        this.nucleons.push(new Neutron());
+        this.nucleons.push(new Neutron());
+        this.nucleons.push(new Proton());
+        this.nucleons.push(new Neutron());
+        this.nucleons.push(new Neutron());
+        this.nucleons.push(new Neutron());
+    }  
+}
+
+class  Lithium7Nucleus extends Nucleus {
+    constructor() {
+        super();
+
+        this.label = "Lithium-7 Nucleus";
+        this.type = "3,7 Li";
+   
+        this.centre = new Vector2D(200, 200);
+        
+        this.nucleons.push(new Proton());
+        this.nucleons.push(new Neutron());
+        this.nucleons.push(new Proton());
+        this.nucleons.push(new Neutron());
+        this.nucleons.push(new Proton());
+        this.nucleons.push(new Neutron());
+        this.nucleons.push(new Neutron());
+    }  
+}
+
+class   Beryllium7Nucleus extends Nucleus {
+    constructor() {
+        super();
+
+        this.label = "Beryllium-7 Nucleus";
+        this.type = "4,7 Be";
+   
+        this.centre = new Vector2D(200, 200);
+
+        this.nucleons.push(new Proton());
+        this.nucleons.push(new Neutron());
+        this.nucleons.push(new Proton());
+        this.nucleons.push(new Neutron());
+        this.nucleons.push(new Proton());
+        this.nucleons.push(new Neutron());
+        this.nucleons.push(new Proton());
+    }  
+}
+
+class   Beryllium8Nucleus extends Nucleus {
+    constructor() {
+        super();
+
+        this.label = "Beryllium-8 Nucleus";
+        this.type = "4,8 Be";
+   
+        this.centre = new Vector2D(200, 200);
+
+        this.nucleons.push(new Proton());
+        this.nucleons.push(new Neutron());
+        this.nucleons.push(new Proton());
+        this.nucleons.push(new Neutron());
         this.nucleons.push(new Proton());
         this.nucleons.push(new Neutron());
         this.nucleons.push(new Proton());
