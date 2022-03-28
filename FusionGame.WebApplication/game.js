@@ -1,33 +1,20 @@
 ﻿
-class Game {
+class Game extends Application {
     constructor(canvasId) {
-        this.canvasId = canvasId;
+        super(canvasId);
+
         this.entities = [];
 
         this.time = 0;
     }
 
     initialise() {
-        this.canvas = document.getElementById(this.canvasId);
-        this.canvasLeft = this.canvas.getBoundingClientRect().left;
-        this.canvasTop = this.canvas.getBoundingClientRect().top;
-
-        this.resolutionFactor = 3;
-
-        this.canvas.width = window.innerWidth * this.resolutionFactor;
-        this.canvas.height = window.innerHeight * this.resolutionFactor;
-
-        this.canvas.style.width = window.innerWidth + "px";
-        this.canvas.style.height = window.innerHeight + "px";
+        super.initialise();
 
         this.areaWidth = window.innerWidth;
         this.areaHeight = window.innerHeight;
 
-        this.context = this.canvas.getContext("2d");
-        this.context.scale(this.resolutionFactor, this.resolutionFactor);
-        this.context.imageSmoothingQuality = "high";
-
-        this.graphics = new GraphicsContext(this.context);
+        this.graphics = new GameGraphicsContext(this.context);
 
         this.targetPosition = new Vector2D(this.areaWidth / 2, this.areaHeight * 0.2);
         this.target = new Proton();
@@ -116,7 +103,7 @@ class Game {
 
             e.force = e.force.add(f);
 
-            var r = ds(e.centre, this.target.centre);
+            var r = separation(e.centre, this.target.centre);
 
             if (r < 10) {
                 this.attemptFuse(e);
@@ -135,7 +122,7 @@ class Game {
         var coulombConstant = 90000;
         var minimumInteractionDistance = 3;
 
-        var r = ds(particle1.centre, particle2.centre);
+        var r = separation(particle1.centre, particle2.centre);
 
         if (r > minimumInteractionDistance) {
             var u = particle2.centre.subtract(particle1.centre).u;
@@ -247,6 +234,8 @@ class Game {
         this.chamber.draw(this.graphics);
     }
 }
+
+var game = new Game("gameCanvas");
 
 
 
