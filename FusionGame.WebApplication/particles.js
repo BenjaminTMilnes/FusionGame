@@ -29,6 +29,8 @@ class Particle extends Entity {
 
         this.label = "";
         this.showLabel = false;
+
+        this.excitationOffset = new Vector2D();
     }
 
     update(time, timeDelta) {
@@ -50,27 +52,29 @@ class Particle extends Entity {
     draw(graphics) {
         super.draw(graphics);
 
+        var c = this.centre.add(this.excitationOffset);
+
         if (this.showTrail) {
             graphics.drawPath(this.trail, "none", "#cce8ff");
         }
 
-        var gradient = graphics.createNeutralChargeGradient(this.centre, this.radius);
+        var gradient = graphics.createNeutralChargeGradient(c, this.radius);
         var lineColour = "#444444";
 
         if (this.charge == 1) {
-            gradient = graphics.createPositiveChargeGradient(this.centre, this.radius);
+            gradient = graphics.createPositiveChargeGradient(c, this.radius);
             lineColour = "#7f0217";
         }
 
         if (this.charge == -1) {
-            gradient = graphics.createNegativeChargeGradient(this.centre, this.radius);
+            gradient = graphics.createNegativeChargeGradient(c, this.radius);
             lineColour = "#04437c";
         }
 
-        graphics.drawCircle(this.centre, this.radius, gradient, lineColour);
+        graphics.drawCircle(c, this.radius, gradient, lineColour);
 
         if (this.showLabel) {
-            graphics.drawText(this.label, this.centre.translateY(-30));
+            graphics.drawText(this.label, c.translateY(-30));
         }
     }
 }
@@ -142,6 +146,8 @@ class Nucleus extends Entity {
         this.showTrail = false;
 
         this.nucleons = [];
+
+        this.excitationLevel = 1;
     }
 
     get charge() {
@@ -226,6 +232,15 @@ class Nucleus extends Entity {
                 this.nucleons[i].centre = this.centre.add(u1.times(1).rotate(i * 120));
             }
         }
+
+        var phase = 0;
+
+        this.nucleons.forEach(n => {
+            if (this.excitationLevel == 1){
+                phase += 1.3;
+                n.excitationOffset = v2(Math.sin(2*time+ phase), Math.sin(2 *time * 1.3 + phase)).times(1);
+            }
+        });
     }
 
     draw(graphics) {
